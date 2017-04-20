@@ -16,12 +16,16 @@ Role Variables
 --------------
 
 ```
+---
 # defaults file for ansible-timezone
 
 # set your desired default timezone
-#timezone: 'UTC'
-#timezone: 'EST5EDT'
-timezone: 'America/New_York'
+
+# timezone: 'EST5EDT'
+# timezone: 'America/New_York'
+timezone: 'UTC'
+
+timezone_update_hardware_clock: false
 ```
 
 Dependencies
