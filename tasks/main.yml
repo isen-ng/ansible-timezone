@@ -1,5 +1,14 @@
 ---
 # tasks file for ansible-timezone
+- name: main | Checking If /etc/localtime Is A Symlink
+  stat:
+    path: "/etc/localtime"
+  register: "timezone_etc_localtime"
+  changed_when: false
+  tags:
+    - configuration
+    - timezone
+
 - name: main | configuring /etc/localtime
   file:
     src: "/usr/share/zoneinfo/{{ timezone }}"
@@ -8,6 +17,18 @@
     # We force this in order to overwrite the destination if it is a file vs.
     # a symlink
     force: yes
+  when: not timezone_etc_localtime['stat']['islnk']
+  tags:
+    - configuration
+    - timezone
+
+- name: main | configuring /etc/localtime
+  file:
+    src: "/usr/share/zoneinfo/{{ timezone }}"
+    dest: "/etc/localtime"
+    state: "link"
+    force: yes
+  when: timezone_etc_localtime['stat']['islnk']
   tags:
     - configuration
     - timezone
