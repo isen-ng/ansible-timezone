@@ -1,44 +1,19 @@
 ---
 # tasks file for ansible-timezone
-- name: main | Checking If /etc/localtime Is A Symlink
-  stat:
-    path: "/etc/localtime"
-  register: "timezone_etc_localtime"
-  changed_when: false
-  tags:
-    - configuration
-    - timezone
 
-- name: main | configuring /etc/localtime
-  file:
-    src: "/usr/share/zoneinfo/{{ timezone }}"
-    dest: "/etc/localtime"
-    state: "link"
-    # We force this in order to overwrite the destination if it is a file vs.
-    # a symlink
-    force: yes
-  when: not timezone_etc_localtime['stat']['islnk']
+- name: main | Setting Timezone
+  timezone:
+    name: "{{ timezone }}"
   tags:
     - configuration
     - timezone
+  when: not timezone_update_hardware_clock
 
-- name: main | configuring /etc/localtime
-  file:
-    src: "/usr/share/zoneinfo/{{ timezone }}"
-    dest: "/etc/localtime"
-    state: "link"
-    force: yes
-  when: timezone_etc_localtime['stat']['islnk']
+- name: main | Setting Timezone And Hardware Clock
+  timezone:
+    name: "{{ timezone }}"
+    hwclock: true
   tags:
     - configuration
     - timezone
-
-- name: main | configuring /etc/timezone
-  template:
-    src: "timezone.j2"
-    dest: "/etc/timezone"
-  notify: update tzdata
-  when: ansible_os_family == "Debian"
-  tags:
-    - configuration
-    - timezone
+  when: timezone_update_hardware_clock
