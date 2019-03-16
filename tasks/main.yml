@@ -1,5 +1,11 @@
 ---
-- name: Setting Timezone
+- name: "Install tzdata"
+  apt:
+    name: tzdata
+    state: present
+  tags:
+    - timezone  
+- name: "Setting Timezone to {{ timezone }}"
   timezone:
     name: "{{ timezone }}"
   tags:
